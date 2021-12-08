@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: erlang:24.1
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compile
+        run: make
+      - name: Run Tests
+        run: make proper
+      - name: Run Dialyzer
+        run: make dialyze
+      - name: Clean up
+        run: make distclean
