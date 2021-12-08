@@ -1,0 +1,13 @@
+{
+	application,
+	devchallenge,
+	[
+		{description, "Dev Challenge REST"},
+		{vsn, "0.1.0"},
+		{registered, []},
+		{applications, [kernel, stdlib, cowboy, jsx]},
+		{modules, [devchallenge_app, devchallenge_sup, devchallenge_handler]},
+		{mod, {devchallenge_app, []}},
+		{env, []}
+	]
+}.
