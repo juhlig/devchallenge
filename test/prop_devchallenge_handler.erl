@@ -1,47 +1,6 @@
--module(prop_devchallenge).
+-module(prop_devchallenge_handler).
 
 -include_lib("proper/include/proper.hrl").
-
-prop_listsum() ->
-	?FORALL(
-		List,
-		oneof(
-			[
-				list(integer()), % list all integers (valid)
-				list(term()), % list of anything (maybe valid if all integers)
-				list(?SUCHTHAT(X, term(), not is_integer(X))) % list of all non-integers (invalid)
-			]
-		),
-		begin
-			case lists:all(fun is_integer/1, List) of
-				true ->
-					Res = devchallenge_handler:list_sum(List),
-					is_integer(Res) andalso Res =:= lists:sum(List);
-				false ->
-					error =:= devchallenge_handler:list_sum(List)
-			end
-		end
-	).
-
-prop_digitsum_valid() ->
-	?FORALL(
-		Int,
-		integer(),
-		begin
-			Res = devchallenge_handler:digit_sum(Int),
-			Exp = digit_sum(Int),
-			Res =:= Exp
-		end
-	).
-
-prop_digitsum_invalid() ->
-	?FORALL(
-		NonInt,
-		?SUCHTHAT(X, term(), not is_integer(X)),
-		begin
-			ok =/= catch begin devchallenge_handler:digit_sum(NonInt), ok end
-		end
-	).
 
 prop_request_valid() ->
 	?SETUP(
@@ -53,7 +12,7 @@ prop_request_valid() ->
 			IntList,
 			list(integer()),
 			begin
-				Exp = integer_to_binary(digit_sum(lists:sum(IntList))),
+				Exp = integer_to_binary(devchallenge_test_helper:digit_sum(lists:sum(IntList))),
 				Json = jsx:encode(#{<<"address">> => #{<<"values">> => IntList}}),
 				{ok, Sock} = gen_tcp:connect("localhost", 8080, [{active, false}, binary]),
 				ok = gen_tcp:send(Sock, build_request(Json)),
@@ -120,13 +79,3 @@ get_body(<<"\r\n\r\n", Body/binary>>) ->
 	Body;
 get_body(<<_, More/binary>>) ->
 	get_body(More).
-
-digit_sum(Int) ->
-	lists:foldr(
-		fun
-			($-, Acc) -> Acc * -1;
-			(D, Acc) -> (D - $0) + Acc
-		end,
-		0,
-		integer_to_list(Int)
-	).

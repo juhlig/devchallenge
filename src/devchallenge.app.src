@@ -6,7 +6,7 @@
 		{vsn, "0.1.0"},
 		{registered, []},
 		{applications, [kernel, stdlib, cowboy, jsx]},
-		{modules, [devchallenge_app, devchallenge_sup, devchallenge_handler]},
+		{modules, [devchallenge_app, devchallenge_sup, devchallenge_handler, devchallenge_transform]},
 		{mod, {devchallenge_app, []}},
 		{env, []}
 	]
